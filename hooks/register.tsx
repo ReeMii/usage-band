@@ -42,9 +42,9 @@ export const TONES = {
 export type Tone = keyof typeof TONES
 
 /**
- * CSS pixels per cell of the band's column, on the high side on purpose: the surface shrinks a
- * drawing wider than its slot to fit exactly but never stretches a narrower one, so a drawing a
- * little too wide is what fills the width. The engine reports the column less these five cells.
+ * CSS pixels per cell of the band's column. The engine reports the column less these five cells.
+ * The surface scales the drawing to its slot, stretching it too, but only as a child of a column
+ * Box, which is what fills the width.
  */
 const CELL_PX = 7.6
 const ENGINE_CELLS = 5
