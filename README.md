@@ -11,6 +11,8 @@ of the way through, and red past today's divider; on the last day it goes straig
 colour compares everything used so far with today's divider. A day turns at the reset's time of
 day, not at midnight.
 
+![The band on a Monday in each of its four colours: green at 30%, blue at 46%, orange at 55% and red at 63%](assets/usage-cases.png)
+
 The figures come with a model response, so a new session shows the last reading any session kept,
 dimmed, until its first reply. Usage in other sessions shows up here with this session's next reply.
 
