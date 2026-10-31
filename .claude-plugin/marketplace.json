@@ -1,0 +1,11 @@
+{
+  "name": "usage-band",
+  "owner": { "name": "Remigiusz Loginow" },
+  "plugins": [
+    {
+      "name": "usage-band",
+      "source": "./",
+      "description": "A band above the prompt showing the week's usage against the week's seven days."
+    }
+  ]
+}
