@@ -57,10 +57,10 @@ const BAR_RADIUS = 3
 const LABEL_SIZE = 9
 const TAIL_SIZE = 11
 const LABEL_BASELINE = 9.7
-/** A label's width per character, near enough to find its middle. */
-const LABEL_CHAR_PX = 5
-/** Today's label, whether or not the fill has reached it. */
+/** Labels on the empty bar, today's among them, and over the fill: the app's own background. */
+export const LABEL_ON_TRACK = '#b0b0b0'
 export const LABEL_TODAY = '#f5c518'
+export const LABEL_ON_FILL = '#191919'
 const TAIL_BASELINE = 10.4
 const MIN_BAR_WIDTH = 240
 /** Room for the percent and the end: per character, and between them and the bar. */
@@ -151,7 +151,8 @@ export const endsAt = (resetsAt: number): string => {
 
 /**
  * The band as an SVG document: the bar, its dividers as tall as it is, the day labels laid over
- * it, and `tail` to its right, all centred on one line. `tail` is drawn here because a Text can
+ * it (grey, today yellow; over the fill, the app's background), and `tail` to its right, all
+ * centred on one line. `tail` is drawn here because a Text can
  * only take the surface's own faces, never the labels'. `width` is the bar's, `total` the whole
  * drawing's. The week's end needs no divider: the bar ends there.
  */
@@ -178,28 +179,34 @@ export const barOf = (args: {
       edge =>
         `<rect x="${edge - 0.5}" y="${BAR_TOP}" width="1" height="${BAR_THICKNESS}" fill="#6f6f6f"/>`,
     )
-  const names = labels.map((label, index) => {
-    const isToday = index === day
-    const right = ends[index]! - 4
-    // Over the fill once the fill reaches the label's middle.
-    const isOverFill = fill >= right - (label.length * LABEL_CHAR_PX) / 2
-    const colour = isToday ? LABEL_TODAY : isOverFill ? '#ffffff' : '#b0b0b0'
-    const weight = isToday ? 600 : 400
+  const fillWidth = Math.round(fill * 10) / 10
+  // The labels twice: on the empty bar, then over the fill, clipped to it, so a label the fill
+  // ends inside changes colour exactly at the fill's edge.
+  const names = (overFill: boolean): string =>
+    labels
+      .map((label, index) => {
+        const isToday = index === day
+        const colour = overFill ? LABEL_ON_FILL : isToday ? LABEL_TODAY : LABEL_ON_TRACK
+        const weight = isToday ? 600 : 400
 
-    return (
-      `<text x="${right}" y="${LABEL_BASELINE}" text-anchor="end" ` +
-      `font-size="${LABEL_SIZE}" font-weight="${weight}" fill="${colour}">${label}</text>`
-    )
-  })
+        return (
+          `<text x="${ends[index]! - 4}" y="${LABEL_BASELINE}" text-anchor="end" ` +
+          `font-size="${LABEL_SIZE}" font-weight="${weight}" fill="${colour}">${label}</text>`
+        )
+      })
+      .join('')
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${total}" height="${BAND_HEIGHT}" ` +
     `viewBox="0 0 ${total} ${BAND_HEIGHT}" font-family="-apple-system, system-ui, sans-serif"` +
     `${isDim ? ' opacity="0.6"' : ''}>` +
     `<rect y="${BAR_TOP}" width="${width}" height="${BAR_THICKNESS}" rx="${BAR_RADIUS}" fill="#454545"/>` +
-    `<rect y="${BAR_TOP}" width="${Math.round(fill * 10) / 10}" height="${BAR_THICKNESS}" ` +
+    `<clipPath id="usage-band-fill"><rect y="${BAR_TOP}" width="${fillWidth}" ` +
+    `height="${BAR_THICKNESS}" rx="${BAR_RADIUS}"/></clipPath>` +
+    `<rect y="${BAR_TOP}" width="${fillWidth}" height="${BAR_THICKNESS}" ` +
     `rx="${BAR_RADIUS}" fill="${tone}"/>` +
-    `${dividers.join('')}${names.join('')}` +
+    `${dividers.join('')}${names(false)}` +
+    `<g clip-path="url(#usage-band-fill)">${names(true)}</g>` +
     `<text x="${total}" y="${TAIL_BASELINE}" text-anchor="end" font-size="${TAIL_SIZE}" ` +
     `fill="#e4e4e4">${tail}</text></svg>`
   )

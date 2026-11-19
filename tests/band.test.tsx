@@ -13,6 +13,8 @@ import {
   settled,
   toneOf,
   TONES,
+  LABEL_ON_FILL,
+  LABEL_ON_TRACK,
   LABEL_TODAY,
   WEEK_MS,
 } from '../hooks/register'
@@ -144,7 +146,8 @@ describe('the bar', () => {
   test('it draws seven labels, six dividers as tall as the bar, and the fill in its tone', () => {
     const svg = barOf(args)
 
-    expect(svg.match(/<text /g)).toHaveLength(8)
+    // Each label twice, on the bar and over the fill, and the tail.
+    expect(svg.match(/<text /g)).toHaveLength(15)
     expect(svg.match(/width="1" height="11"/g)).toHaveLength(6)
     expect(svg).not.toContain('x="699" y="1" width="1"')
     expect(svg).toContain(`width="105" height="11" rx="3" fill="${TONES.normal}"`)
@@ -157,20 +160,21 @@ describe('the bar', () => {
     expect(svg).toContain('y="9.7" text-anchor="end" font-size="9" font-weight="400"')
   })
 
-  test('labels the fill has reached turn white; the rest stay grey; today is yellow', () => {
+  test('on the bar the labels are grey and today yellow; over the fill, clipped to it, dark', () => {
     const svg = barOf({ ...args, percentUsed: 30, day: 3 })
+    const [track, over] = svg.split('<g clip-path="url(#usage-band-fill)">')
 
-    expect(svg).toContain('fill="#ffffff">Fri<')
-    expect(svg).toContain('fill="#ffffff">Sat<')
-    expect(svg).toContain('fill="#b0b0b0">Sun<')
-    expect(svg).toContain(`fill="${LABEL_TODAY}">Mon<`)
+    expect(svg).toContain('<clipPath id="usage-band-fill"><rect y="1" width="210" height="11" rx="3"/></clipPath>')
+    expect(track).toContain(`fill="${LABEL_ON_TRACK}">Sun<`)
+    expect(track).toContain(`font-weight="600" fill="${LABEL_TODAY}">Mon<`)
+    expect(over?.match(new RegExp(`fill="${LABEL_ON_FILL}"`, 'g'))).toHaveLength(7)
+    expect(over).toContain(`font-weight="600" fill="${LABEL_ON_FILL}">Mon<`)
   })
 
   test("today's label stands out and past 100% the fill stops at the end", () => {
     const svg = barOf({ ...args, percentUsed: 104, day: LAST_DAY })
 
     expect(svg).toContain(`font-weight="600" fill="${LABEL_TODAY}">Thu<`)
-    expect(svg).toContain('font-weight="400" fill="#ffffff">Wed<')
     expect(svg).toContain(`width="700" height="11" rx="3" fill="${TONES.over}"`)
   })
 
