@@ -140,27 +140,35 @@ describe('the bar', () => {
     isDim: false,
   }
 
-  test('it draws seven labels, seven dividers, and the fill in its tone', () => {
+  test('it draws seven labels, six dividers as tall as the bar, and the fill in its tone', () => {
     const svg = barOf(args)
 
     expect(svg.match(/<text /g)).toHaveLength(8)
-    expect(svg.match(/height="11"/g)).toHaveLength(7)
-    expect(svg).toContain(`width="105" height="4" rx="2" fill="${TONES.normal}"`)
+    expect(svg.match(/width="1" height="11"/g)).toHaveLength(6)
+    expect(svg).not.toContain('x="699" y="1" width="1"')
+    expect(svg).toContain(`width="105" height="11" rx="3" fill="${TONES.normal}"`)
+  })
+
+  test('the labels sit on the bar, after it in the drawing, 2px smaller than the tail', () => {
+    const svg = barOf(args)
+
+    expect(svg.indexOf('>Fri<')).toBeGreaterThan(svg.lastIndexOf('width="1" height="11"'))
+    expect(svg).toContain('y="9.7" text-anchor="end" font-size="9" font-weight="400"')
   })
 
   test("today's label stands out and past 100% the fill stops at the end", () => {
     const svg = barOf({ ...args, percentUsed: 104, day: LAST_DAY })
 
     expect(svg).toContain(`font-weight="600" fill="#ffffff">Thu<`)
-    expect(svg).toContain(`width="700" height="4" rx="2" fill="${TONES.over}"`)
+    expect(svg).toContain(`width="700" height="11" rx="3" fill="${TONES.over}"`)
   })
 
   test('the percent and the end sit flush right, in the labels\' font', () => {
     const svg = barOf(args)
 
-    expect(svg).toContain('width="830" height="26"')
+    expect(svg).toContain('width="830" height="13"')
     expect(svg).toContain('font-family="-apple-system, system-ui, sans-serif"')
-    expect(svg).toContain('<text x="830" y="25" text-anchor="end" font-size="11" fill="#e4e4e4">15% \u00b7 Thu 22:00</text>')
+    expect(svg).toContain('<text x="830" y="10.4" text-anchor="end" font-size="11" fill="#e4e4e4">15% \u00b7 Thu 22:00</text>')
   })
 
   test('a dim bar says so', () => {

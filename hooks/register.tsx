@@ -48,7 +48,16 @@ export type Tone = keyof typeof TONES
  */
 const CELL_PX = 7.6
 const ENGINE_CELLS = 5
-const BAR_HEIGHT = 26
+/** The drawing's height, and the bar's: as thick as a divider is tall, centred in it. */
+const BAND_HEIGHT = 13
+const BAR_THICKNESS = 11
+const BAR_TOP = (BAND_HEIGHT - BAR_THICKNESS) / 2
+const BAR_RADIUS = 3
+/** Text sizes, and baselines that put a capital's middle on the bar's. */
+const LABEL_SIZE = 9
+const TAIL_SIZE = 11
+const LABEL_BASELINE = 9.7
+const TAIL_BASELINE = 10.4
 const MIN_BAR_WIDTH = 240
 /** Room for the percent and the end: per character, and between them and the bar. */
 const TAIL_CHAR_PX = 6
@@ -137,9 +146,10 @@ export const endsAt = (resetsAt: number): string => {
 }
 
 /**
- * The band as an SVG document: day labels above, the thin bar and its dividers beneath, and
- * `tail` to its right. `tail` is drawn here because a Text can only take the surface's own faces,
- * never the labels'. `width` is the bar's, `total` the whole drawing's.
+ * The band as an SVG document: the bar, its dividers as tall as it is, the day labels laid over
+ * it, and `tail` to its right, all centred on one line. `tail` is drawn here because a Text can
+ * only take the surface's own faces, never the labels'. `width` is the bar's, `total` the whole
+ * drawing's. The week's end needs no divider: the bar ends there.
  */
 export const barOf = (args: {
   width: number
@@ -154,29 +164,37 @@ export const barOf = (args: {
   const sectionWidth = width / labels.length
   const fill = (Math.min(100, percentUsed) / 100) * width
   const tone = TONES[toneOf(percentUsed, day)]
+  const ends = labels.map((_, index) =>
+    Math.min(Math.round((index + 1) * sectionWidth * 10) / 10, width - 0.5),
+  )
 
-  const sections = labels.map((label, index) => {
-    const end = Math.round((index + 1) * sectionWidth * 10) / 10
-    const edge = Math.min(end, width - 0.5)
+  const dividers = ends
+    .slice(0, -1)
+    .map(
+      edge =>
+        `<rect x="${edge - 0.5}" y="${BAR_TOP}" width="1" height="${BAR_THICKNESS}" fill="#6f6f6f"/>`,
+    )
+  const names = labels.map((label, index) => {
     const isToday = index === day
-    const colour = isToday ? '#ffffff' : '#8f8f8f'
+    const colour = isToday ? '#ffffff' : '#b0b0b0'
     const weight = isToday ? 600 : 400
 
     return (
-      `<text x="${edge - 4}" y="11" text-anchor="end" font-size="11" ` +
-      `font-weight="${weight}" fill="${colour}">${label}</text>` +
-      `<rect x="${edge - 0.5}" y="15" width="1" height="11" fill="#6f6f6f"/>`
+      `<text x="${ends[index]! - 4}" y="${LABEL_BASELINE}" text-anchor="end" ` +
+      `font-size="${LABEL_SIZE}" font-weight="${weight}" fill="${colour}">${label}</text>`
     )
   })
 
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${total}" height="${BAR_HEIGHT}" ` +
-    `viewBox="0 0 ${total} ${BAR_HEIGHT}" font-family="-apple-system, system-ui, sans-serif"` +
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${total}" height="${BAND_HEIGHT}" ` +
+    `viewBox="0 0 ${total} ${BAND_HEIGHT}" font-family="-apple-system, system-ui, sans-serif"` +
     `${isDim ? ' opacity="0.6"' : ''}>` +
-    `<rect y="19" width="${width}" height="4" rx="2" fill="#454545"/>` +
-    `<rect y="19" width="${Math.round(fill * 10) / 10}" height="4" rx="2" fill="${tone}"/>` +
-    `${sections.join('')}` +
-    `<text x="${total}" y="25" text-anchor="end" font-size="11" fill="#e4e4e4">${tail}</text></svg>`
+    `<rect y="${BAR_TOP}" width="${width}" height="${BAR_THICKNESS}" rx="${BAR_RADIUS}" fill="#454545"/>` +
+    `<rect y="${BAR_TOP}" width="${Math.round(fill * 10) / 10}" height="${BAR_THICKNESS}" ` +
+    `rx="${BAR_RADIUS}" fill="${tone}"/>` +
+    `${dividers.join('')}${names.join('')}` +
+    `<text x="${total}" y="${TAIL_BASELINE}" text-anchor="end" font-size="${TAIL_SIZE}" ` +
+    `fill="#e4e4e4">${tail}</text></svg>`
   )
 }
 

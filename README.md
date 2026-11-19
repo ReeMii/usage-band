@@ -2,7 +2,7 @@
 
 A band above the prompt, on the desktop surface, showing the week's usage against the week's seven
 days. Each of the bar's seven sections is a day of the window and a seventh of the limit, named
-above its end by the day most of it falls on. Today's name is bright. The percent and the time the
+inside the bar, at its end, by the day most of it falls on. Today's name is bright. The percent and the time the
 week ends sit to the right.
 
 The fill is green while it has not reached today's section, blue inside it, orange once it is 80%
