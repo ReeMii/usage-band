@@ -18,8 +18,18 @@ import {
   WEEK_MS,
 } from '../hooks/register'
 
-/** Thursday 22:00 local, whatever zone the test runs in. */
-const RESET = new Date(2026, 10, 5, 22, 0).getTime()
+/**
+ * The coming Thursday 22:00 local, whatever zone the test runs in: the band reads the real clock,
+ * and a reset already past would show the next week, with nothing used.
+ */
+const RESET = (() => {
+  const reset = new Date()
+  reset.setHours(22, 0, 0, 0)
+  reset.setDate(reset.getDate() + ((4 - reset.getDay() + 7) % 7))
+  if (reset.getTime() <= Date.now()) reset.setDate(reset.getDate() + 7)
+
+  return reset.getTime()
+})()
 const WEEK_START = RESET - WEEK_MS
 
 const BAND = {
