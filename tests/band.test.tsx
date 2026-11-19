@@ -15,7 +15,6 @@ import {
   TONES,
   LABEL_ON_FILL,
   LABEL_ON_TRACK,
-  LABEL_TODAY,
   WEEK_MS,
 } from '../hooks/register'
 
@@ -143,12 +142,12 @@ describe('the bar', () => {
     isDim: false,
   }
 
-  test('it draws seven labels, six dividers as tall as the bar, and the fill in its tone', () => {
+  test('it draws seven labels, six dividers as tall as the bar, each twice,, and the fill in its tone', () => {
     const svg = barOf(args)
 
-    // Each label twice, on the bar and over the fill, and the tail.
+    // Each label and divider twice, on the bar and over the fill, and the tail.
     expect(svg.match(/<text /g)).toHaveLength(15)
-    expect(svg.match(/width="1" height="11"/g)).toHaveLength(6)
+    expect(svg.match(/width="1" height="11"/g)).toHaveLength(12)
     expect(svg).not.toContain('x="699" y="1" width="1"')
     expect(svg).toContain(`width="105" height="11" rx="3" fill="${TONES.normal}"`)
   })
@@ -156,25 +155,28 @@ describe('the bar', () => {
   test('the labels sit on the bar, after it in the drawing, 2px smaller than the tail', () => {
     const svg = barOf(args)
 
-    expect(svg.indexOf('>Fri<')).toBeGreaterThan(svg.lastIndexOf('width="1" height="11"'))
+    const [track = ''] = svg.split('<g clip-path=')
+
+    expect(track.indexOf('>Fri<')).toBeGreaterThan(track.lastIndexOf('width="1" height="11"'))
     expect(svg).toContain('y="9.7" text-anchor="end" font-size="9" font-weight="400"')
   })
 
-  test('on the bar the labels are grey and today yellow; over the fill, clipped to it, dark', () => {
+  test('on the bar labels and dividers are grey; over the fill, clipped to it, dark', () => {
     const svg = barOf({ ...args, percentUsed: 30, day: 3 })
     const [track, over] = svg.split('<g clip-path="url(#usage-band-fill)">')
 
     expect(svg).toContain('<clipPath id="usage-band-fill"><rect y="1" width="210" height="11" rx="3"/></clipPath>')
     expect(track).toContain(`fill="${LABEL_ON_TRACK}">Sun<`)
-    expect(track).toContain(`font-weight="600" fill="${LABEL_TODAY}">Mon<`)
-    expect(over?.match(new RegExp(`fill="${LABEL_ON_FILL}"`, 'g'))).toHaveLength(7)
-    expect(over).toContain(`font-weight="600" fill="${LABEL_ON_FILL}">Mon<`)
+    expect(track?.match(new RegExp(`width="1" height="11" fill="${LABEL_ON_TRACK}"`, 'g'))).toHaveLength(6)
+    expect(over?.match(new RegExp(`fill="${LABEL_ON_FILL}"`, 'g'))).toHaveLength(13)
   })
 
-  test("today's label stands out and past 100% the fill stops at the end", () => {
+  test("today's label is bold and in capitals, and past 100% the fill stops at the end", () => {
     const svg = barOf({ ...args, percentUsed: 104, day: LAST_DAY })
 
-    expect(svg).toContain(`font-weight="600" fill="${LABEL_TODAY}">Thu<`)
+    expect(svg).toContain(`font-weight="700" fill="${LABEL_ON_TRACK}">THU<`)
+    expect(svg).toContain(`font-weight="400" fill="${LABEL_ON_TRACK}">Wed<`)
+    expect(svg).not.toContain('>Thu<')
     expect(svg).toContain(`width="700" height="11" rx="3" fill="${TONES.over}"`)
   })
 

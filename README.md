@@ -2,9 +2,9 @@
 
 A band above the prompt, on the desktop surface, showing the week's usage against the week's seven
 days. Each of the bar's seven sections is a day of the window and a seventh of the limit, named
-inside the bar, at its end, by the day most of it falls on. Names are grey and today's yellow;
-where the fill runs under a name, that part of it takes the app's background colour. The percent
-and the time the week ends sit to the right.
+inside the bar, at its end, by the day most of it falls on. Today's name is bold and in capitals.
+Names and dividers are grey; where the fill runs under one, that part of it takes the app's
+background colour. The percent and the time the week ends sit to the right.
 
 The fill is green while it has not reached today's section, blue inside it, orange once it is 80%
 of the way through, and red past today's divider; on the last day it goes straight to red at that
