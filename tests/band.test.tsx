@@ -13,6 +13,7 @@ import {
   settled,
   toneOf,
   TONES,
+  LABEL_TODAY,
   WEEK_MS,
 } from '../hooks/register'
 
@@ -156,10 +157,20 @@ describe('the bar', () => {
     expect(svg).toContain('y="9.7" text-anchor="end" font-size="9" font-weight="400"')
   })
 
+  test('labels the fill has reached turn white; the rest stay grey; today is yellow', () => {
+    const svg = barOf({ ...args, percentUsed: 30, day: 3 })
+
+    expect(svg).toContain('fill="#ffffff">Fri<')
+    expect(svg).toContain('fill="#ffffff">Sat<')
+    expect(svg).toContain('fill="#b0b0b0">Sun<')
+    expect(svg).toContain(`fill="${LABEL_TODAY}">Mon<`)
+  })
+
   test("today's label stands out and past 100% the fill stops at the end", () => {
     const svg = barOf({ ...args, percentUsed: 104, day: LAST_DAY })
 
-    expect(svg).toContain(`font-weight="600" fill="#ffffff">Thu<`)
+    expect(svg).toContain(`font-weight="600" fill="${LABEL_TODAY}">Thu<`)
+    expect(svg).toContain('font-weight="400" fill="#ffffff">Wed<')
     expect(svg).toContain(`width="700" height="11" rx="3" fill="${TONES.over}"`)
   })
 

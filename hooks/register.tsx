@@ -57,6 +57,10 @@ const BAR_RADIUS = 3
 const LABEL_SIZE = 9
 const TAIL_SIZE = 11
 const LABEL_BASELINE = 9.7
+/** A label's width per character, near enough to find its middle. */
+const LABEL_CHAR_PX = 5
+/** Today's label, whether or not the fill has reached it. */
+export const LABEL_TODAY = '#f5c518'
 const TAIL_BASELINE = 10.4
 const MIN_BAR_WIDTH = 240
 /** Room for the percent and the end: per character, and between them and the bar. */
@@ -176,11 +180,14 @@ export const barOf = (args: {
     )
   const names = labels.map((label, index) => {
     const isToday = index === day
-    const colour = isToday ? '#ffffff' : '#b0b0b0'
+    const right = ends[index]! - 4
+    // Over the fill once the fill reaches the label's middle.
+    const isOverFill = fill >= right - (label.length * LABEL_CHAR_PX) / 2
+    const colour = isToday ? LABEL_TODAY : isOverFill ? '#ffffff' : '#b0b0b0'
     const weight = isToday ? 600 : 400
 
     return (
-      `<text x="${ends[index]! - 4}" y="${LABEL_BASELINE}" text-anchor="end" ` +
+      `<text x="${right}" y="${LABEL_BASELINE}" text-anchor="end" ` +
       `font-size="${LABEL_SIZE}" font-weight="${weight}" fill="${colour}">${label}</text>`
     )
   })
