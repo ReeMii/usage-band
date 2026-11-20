@@ -1,6 +1,6 @@
 {
   "name": "usage-band",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A band above the prompt showing the week's usage against the week's seven days.",
   "types": "./types/index.d.ts"
 }
