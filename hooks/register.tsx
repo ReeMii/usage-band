@@ -279,18 +279,27 @@ export const register: Register = on => {
 
     return (
       <Box flexDirection="column">
-        <Svg
-          source={barOf({
-            width,
-            total: width + tailWidth,
-            tail,
-            percentUsed,
-            day: dayOf(resetsAt, at),
-            labels: labelsOf(resetsAt),
-            isDim: !isCurrent,
-          })}
-          alt={`Weekly usage ${shown}, resets ${ends}`}
-        />
+        {/*
+          An experiment: the desktop gives a row at least a line, about 18px, more than the bar.
+          Placed absolutely the drawing takes no room, so the band may be only its own padding
+          and the bar. The column Box spanning left to right is what the drawing fills.
+        */}
+        <Box>
+          <Box position="absolute" top={0} left={0} right={0} flexDirection="column">
+            <Svg
+              source={barOf({
+                width,
+                total: width + tailWidth,
+                tail,
+                percentUsed,
+                day: dayOf(resetsAt, at),
+                labels: labelsOf(resetsAt),
+                isDim: !isCurrent,
+              })}
+              alt={`Weekly usage ${shown}, resets ${ends}`}
+            />
+          </Box>
+        </Box>
         {below}
       </Box>
     )
