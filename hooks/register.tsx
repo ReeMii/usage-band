@@ -48,19 +48,23 @@ export type Tone = keyof typeof TONES
  */
 const CELL_PX = 7.6
 const ENGINE_CELLS = 5
-/** The drawing's height, and the bar's: as thick as a divider is tall, centred in it. */
-const BAND_HEIGHT = 13
+/**
+ * The drawing's height, and the bar's: as thick as a divider is tall, centred in it. The desktop
+ * gives a row at least a line of text, about 19px, and sets a shorter drawing at its top, leaving
+ * the rest below the bar; a line-tall drawing keeps the space above and below it even.
+ */
+const BAND_HEIGHT = 19
 const BAR_THICKNESS = 11
 const BAR_TOP = (BAND_HEIGHT - BAR_THICKNESS) / 2
 const BAR_RADIUS = 3
 /** Text sizes, and baselines that put a capital's middle on the bar's. */
 const LABEL_SIZE = 9
 const TAIL_SIZE = 11
-const LABEL_BASELINE = 9.7
+const LABEL_BASELINE = BAND_HEIGHT / 2 + 3.2
 /** Labels and dividers on the empty bar, and over the fill: the app's own background. */
 export const LABEL_ON_TRACK = '#b0b0b0'
 export const LABEL_ON_FILL = '#191919'
-const TAIL_BASELINE = 10.4
+const TAIL_BASELINE = BAND_HEIGHT / 2 + 3.9
 const MIN_BAR_WIDTH = 240
 /** Room for the percent and the end: per character, and between them and the bar. */
 const TAIL_CHAR_PX = 6
